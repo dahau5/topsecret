@@ -1,5 +1,4 @@
 import java.util.*;
-import java.util.regex.Pattern;
 
 public class Expression {
     
@@ -41,31 +40,33 @@ public class Expression {
         ExprTree (String s) throws IllegalLineException {
             if (s != null) {
                 myRoot = treehelper(s);
+            } else {
+                throw new IllegalLineException("Input null string for expression");
             }
-            throw new IllegalLineException("Input null string for expression");
         }
         
+        /** Checks equality between two Expr Trees using tree traversal */
         public boolean equals(Object obj) {
-        	ExprTree second = (ExprTree) obj;
-        	return treeEquals(this, second);
+            ExprTree second = (ExprTree) obj;
+            return treeEquals(this, second);
         }
         
         public static boolean treeEquals(ExprTree tree1, ExprTree tree2){
-    		if (tree1.myRoot == null || tree2.myRoot == null){
-    			throw new IllegalArgumentException("Can't use a null tree");
-    		} return treeEqualshelper(tree1.myRoot, tree2.myRoot);
-    	}
-    	
-    	private static boolean treeEqualshelper(ExprTreeNode node1, ExprTreeNode node2){
-    		if(node1 == null && node2 == null){
-    			return true;
-    		}
-    		if(!(node1.myItem.equals(node2))){
-    			return false;
-    		}
-    		return treeEqualshelper(node1.getleft(), node2.getleft()) && treeEqualshelper(node1.getright(), node2.getright());
+            if (tree1.myRoot == null || tree2.myRoot == null){
+                throw new IllegalArgumentException("Can't use a null tree");
+            } return treeEqualshelper(tree1.myRoot, tree2.myRoot);
+        }
         
-    	}
+        private static boolean treeEqualshelper(ExprTreeNode node1, ExprTreeNode node2){
+            if(node1 == null && node2 == null){
+                return true;
+            }
+            if(!(node1.myItem.equals(node2))){
+                return false;
+            }
+            return treeEqualshelper(node1.getleft(), node2.getleft()) && treeEqualshelper(node1.getright(), node2.getright());
+        
+        }
         
         /** Parses a string to create an expression tree that forks based on
          * operators (=> & | ~) and has leaves of single variables.
@@ -73,10 +74,18 @@ public class Expression {
          * If string isn't surrounded by parentheses, it should be ~~~a or some form.
          * If surrounded by parentheses, should be properly nested (equal amount left/right) */
         ExprTreeNode treehelper (String s) throws IllegalLineException {
+            
+            //System.out.println(s);
+            if (s.length() == 0 || s == null) {
+                throw new IllegalLineException("Parser given empty or null string.");
+            }
+            
             // Initialize node w/ dummy string & no children (always replaced)
             ExprTreeNode node = new ExprTreeNode("To Be Replaced");
             String first = s.substring(0, 1);
             String last = s.substring(s.length()-1, s.length());
+            
+            //System.out.println(first);
             
             // If first element is (, last must be ) as well
             if (first.equals("(") && !last.equals(")")) {
@@ -93,67 +102,125 @@ public class Expression {
                 return node;
             }
             
-            // String wasn't one-element, therefore it should start with only ~ or (
-            if (first != "~" || first != "(") {
-                throw new IllegalArgumentException("Branched to substring of length > 1,"
-                        + "didn't start with ( or ~ (expression must either be wrapped() or ~");
-            }
-            String rest = s.substring(1);
+            //Start substring after first element (ideally a '(' ) and before last ')'
+            String rest = s.substring(1, s.length());
             
             // Negation symbols are single nodes; child (rest of expression)
             // is always to its right
-            if (first == "~") {
+            if (first.equals("~")) {
                 node.myItem = ("~");
-                node.myrightchild = treehelper(rest);
+                node.myright = treehelper(s.substring(1));
+                return node;
             }
+            
+            // String wasn't one-element, therefore it should start with only ~ or (
+            if (!first.equals("(")) {
+                throw new IllegalArgumentException("Branched to subexpression of length > 1,"
+                        + "didn't start with ( or ~ (expression must either be wrapped() or ~)");
+            }
+            
             
             // Keep track of parentheses as expression nests ((a & b) => c) => (a | b))
             // Occurrences of ) decrement parencount, occurrences of ( increment
             // If parencount is ever negative, then there are more ) than (
-            // If parencount is non-0 and i has indexed the whole string,
-            // then there aren't equal amounts of ( ) - throw exception
-            String operands = "=> & |";
+            // Searches for operators (=> & |) and splits expr into substrings, recurses
+            // The program should not pass this loop; the initial expression must have either
+            // A unary operator (~, x) or a binary operator (=> & |); the unary operators
+            // Are base cases that return before this loop is reached -
+            // Exiting this loop means there was no binary operator ((a=>b)d)
+            // Or there were unnecessary parentheses (((a=>b))=>c)
             int parencount = 0;
-            for(int i = 0; i < rest.length(); i ++) {
+            int i = 1;
+            while(i < s.length()) {
+                char currentchar = s.charAt(i);
                 if (parencount < 0) {
                     throw new IllegalArgumentException("More ) than (");
                 }
-                if (rest.charAt(i) == '(') {
+                if (currentchar == '(') {
                     parencount ++;
-                } else if (rest.charAt(i) == ')') {
+                    i ++;
+                } else if (currentchar == ')') {
                     parencount --;
-                } else if (rest.charAt(i) == '>' && rest.charAt(i-1) == '=') {
+                    i ++;
+                // Assumes you've reached the '>' in "=>"
+                } else if (currentchar == '>' && s.charAt(i-1) == '=' && parencount == 0) {
                     node.myItem = "=>";
+                    
                     String preop = s.substring(1, i-1);
-                    node.myleftchild = treehelper(preop);
-                    String postop = s.substring(i+1, s.length());
-                    node.myrightchild = treehelper(postop);
+                    node.myleft = treehelper(preop);
+                    
+                    String postop = s.substring(i+1, s.length()-1);
+                    node.myright = treehelper(postop);
+                    
+                    return node;
+                // Reached & or |, split along operator and recurse
+                } else if ((currentchar == '&' || currentchar == '|') && parencount == 0) {
+                    String op = s.substring(i, i+1);
+                    node.myItem = op;
+                    
+                    String preop = s.substring(1, i); // Go from ( until operator
+                    node.myleft = treehelper(preop);
+                    
+                    String postop = s.substring(i+1, s.length()-1);
+                    node.myright = treehelper(postop);
+                    
                     return node;
                 }
+                i ++;
                 
+            }
+            
+            if (i > -1) {
+                throw new IllegalLineException("Constructor had extra () or no operators");
             }
             return node;
         }
         
+        public void print ( ) {
+            if (myRoot != null) {
+                printHelper (myRoot, 0);
+            }
+        }
+        
+        protected static final String indent1 = "    ";
+        
+        /** Traverses tree to print all elements */
+        private static void printHelper (ExprTreeNode root, int indent) {
+            if (root.myright != null) {
+                printHelper(root.myright, indent+1);
+            }
+            println (root.myItem, indent);
+            if (root.myleft != null) {
+                printHelper(root.myleft, indent+1);
+            }
+        }
+        
+        /** Prints necessary indents, then the object */
+        private static void println (Object obj, int indent) {
+            for (int k=0; k<indent; k++) {
+                System.out.print (indent1);
+            }
+            System.out.println (obj);
+        }
         
         /**Nodes of the expression tree. Contain only Strings */
         public static class ExprTreeNode {
             
             /** The item held at this node. */
             private String myItem;
-            private ExprTreeNode myleftchild;
-            private ExprTreeNode myrightchild;
+            private ExprTreeNode myleft;
+            private ExprTreeNode myright;
             
             ExprTreeNode(String s) {
                 myItem = s;
-                myleftchild = myrightchild = null;
+                myleft = myright = null;
             }
             
             /** Make a "full" node with left and right children. */
             ExprTreeNode(String node, String left, String right) {
                 myItem = node;
-                myleftchild = new ExprTreeNode(left);
-                myrightchild = new ExprTreeNode(right);
+                myleft = new ExprTreeNode(left);
+                myright = new ExprTreeNode(right);
             }
             
             /** Get node's item (always a string) */
@@ -163,12 +230,12 @@ public class Expression {
             
             /** Return left child, a Node. */
             public ExprTreeNode getleft() {
-                return myleftchild;
+                return myleft;
             }
             
             /** Return right child, a Node. */
             public ExprTreeNode getright() {
-                return myrightchild;
+                return myright;
             }
         }
     }
