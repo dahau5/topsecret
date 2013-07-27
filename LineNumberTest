@@ -1,0 +1,152 @@
+import static org.junit.Assert.*;
+import java.util.*;
+
+import org.junit.Test;
+
+public class LineNumberTest {
+  
+	/* GENERAL TEST CASES */
+	
+	// Assert than an IllegalLineException is thrown when
+	// line does not hold anything but whitespace
+
+
+	/*
+	1 show (p=>((p=>q)=>q))
+	2 assume p
+	3 show ((p=>q)=>q)
+	3.1 assume (p=>q)
+	3.2 show q
+	3.2.1 mp 2 3.1 q
+	3.3 ic 3.2 ((p=>q)=>q)
+	4 ic 3 (p=>((p=>q)=>q)) */
+
+	@Test
+	public void genericTest() {
+		String err = "";
+		LineNumber lineNum = new LineNumber("1");
+		Expression expr = new Expression("p");
+
+		try {
+			lineNum.nextlinenumber_helper("show", expr);
+		} catch(IllegalLineException e) {
+			err = e.getMessage();
+		}
+		assertEquals(lineNum.myNumber, "2");
+	}
+
+	@Test
+	public void showLineTest() {
+		String err = "";
+		LineNumber lineNum = new LineNumber("3");
+		Expression expr = new Expression("((p=>q)=>q)");
+
+		try {
+			lineNum.nextlinenumber_helper("show", expr);
+		} catch(IllegalLineException e) {
+			err = e.getMessage();
+		}
+		assertEquals(lineNum.myNumber, "3.1");
+	}
+
+	@Test
+	public void showLine2Test() {
+		String err = "";
+		LineNumber lineNum = new LineNumber("3.1");
+		Expression expr = new Expression("(p=>q)");
+
+		try {
+			lineNum.nextlinenumber_helper("assume", expr);
+		} catch(IllegalLineException e) {
+			err = e.getMessage();
+		}
+		assertEquals(lineNum.myNumber, "3.2");
+	}
+
+	@Test
+	public void showLine3Test() {
+		String err = "";
+		LineNumber lineNum = new LineNumber("3.2");
+		Expression expr = new Expression("q");
+
+		try {
+			lineNum.nextlinenumber_helper("show", expr);
+		} catch(IllegalLineException e) {
+			err = e.getMessage();
+		}
+		assertEquals(lineNum.myNumber, "3.2.1");
+	}
+
+	@Test
+	public void showLine4Test() {
+		String err = "";
+		LineNumber lineNum = new LineNumber("3.2.1");
+		Expression expr = new Expression("q");
+
+		try {
+			lineNum.nextlinenumber_helper("mp 2 3.1", expr);
+		} catch(IllegalLineException e) {
+			err = e.getMessage();
+		}
+		assertEquals(lineNum.myNumber, "3.3");
+	}
+
+	@Test
+	public void showLine5Test() {
+		String err = "";
+		LineNumber lineNum = new LineNumber("3.3");
+		Expression expr = new Expression("((p=>q)=>q)");
+
+		try {
+			lineNum.nextlinenumber_helper("ic 3.2", expr);
+		} catch(IllegalLineException e) {
+			err = e.getMessage();
+		}
+		assertEquals(lineNum.myNumber, "4");
+	}
+
+
+	// Make sure nextlinenumber_helper can properly increment
+	// to double digits
+	@Test
+	public void showLine6Test() {
+		String err = "";
+		LineNumber lineNum = new LineNumber("3.9");
+		Expression expr = new Expression("(p=>q)");
+
+		try {
+			lineNum.nextlinenumber_helper("assume", expr);
+		} catch(IllegalLineException e) {
+			err = e.getMessage();
+		}
+		assertEquals(lineNum.myNumber, "3.10");
+	}
+
+	// Make sure nextlinenumber_helper can properly remove
+	// double digits following the rightmost '.' when
+	// appropriate
+	@Test
+	public void showLine7Test() {
+		String err = "";
+		LineNumber lineNum = new LineNumber("3.2.10");
+		Expression expr = new Expression("q");
+
+		try {
+			lineNum.nextlinenumber_helper("mp 2 3.2.5", expr);
+		} catch(IllegalLineException e) {
+			err = e.getMessage();
+		}
+		assertEquals(lineNum.myNumber, "3.3");
+	}
+
+
+	/*1	show (~~p=>p)
+	2	assume ~~p
+	3	show p
+	3.1	assume ~p
+	3.2	co 2 3.1 p
+	4	ic 3 (~~p=>p)*/
+
+
+
+}
