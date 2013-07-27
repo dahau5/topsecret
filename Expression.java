@@ -61,7 +61,7 @@ public class Expression {
             if(node1 == null && node2 == null){
                 return true;
             }
-            if(!(node1.myItem.equals(node2))){
+            if(!(node1.myItem.equals(node2.myItem))){
                 return false;
             }
             return treeEqualshelper(node1.getleft(), node2.getleft()) && treeEqualshelper(node1.getright(), node2.getright());
