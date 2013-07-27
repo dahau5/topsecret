@@ -18,7 +18,7 @@ public class Proof {
 
 	public LineNumber nextLineNumber ( ) {
 		lastLineNumber = valueholder;
-		LineNumber valueholder = LineNumber.nextlinenumber_helper((String)myLineNumbers.get(lastLineNumber).getFirst(), (Expression)myLineNumbers.get(lastLineNumber).getLast());
+		LineNumber valueholder = LineNumber.nextlinenumber_helper((String)myLineNumbers.get(valueholder).getFirst(), (Expression)myLineNumbers.get(lastLineNumber).getLast());
 		return valueholder;
 	}
 
