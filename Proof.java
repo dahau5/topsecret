@@ -134,41 +134,150 @@ public class Proof {
 		Expression exp1;
 		Expression exp2;
 		Expression test;
+		String[] testline_values1;
+		String[] testline_values2;
+		String[] my_line_values;
+		LineNumber linetest1 = new LineNumber("");
+		LineNumber linetest2 = new LineNumber("");
+		
+		if(fun.size() == 3){
+			linetest1 = new LineNumber((String)fun.get(1));
+		}
+		if(fun.size() == 4){
+			linetest1 = new LineNumber((String)fun.get(1));
+			linetest2 = new LineNumber((String)fun.get(2));
+		}
 		
 		String op = (String)fun.getFirst();
+		
 		if (op == "show"){
+			
+			if (fun.size() != 2){
+				throw new IllegalLineException("Wrong number of arguments.");
+			}
+			
 			try{
 				Logic.show((Expression)fun.get(1), lastLineNumber);
 			}catch (IllegalInferenceException a){
 				throw a;
 			}
+		
 		}else if(op == "assume"){
+			
+			if(fun.size() != 2){
+				throw new IllegalLineException("Wrong number of arguments.");
+			}
+			
 			try{
 				Logic.assume((Expression)fun.get(1), lastLineNumber);
 			}catch (IllegalInferenceException a){
 				throw a;
 			}
+		
 		}else if(op == "repeat"){
 			
+			if(fun.size() != 3){
+				throw new IllegalLineException("Wrong number of arguments.");
+			}
+			if(!myLineNumbers.containsKey(linetest1) || !myLineNumbers.containsKey(linetest2)){
+				throw new IllegalInferenceException("Bad line reference. Not a valid linenumber.");
+			}
+			testline_values1 = linetest1.getNum().split(".");
+			my_line_values = valueholder.getNum().split(".");
+			
+			if(testline_values1.length <= my_line_values.length){
+				for (int i = 0; i < testline_values1.length ; i++){
+					if((i+1) == testline_values1.length){
+						if(Integer.parseInt(testline_values1[i]) >= Integer.parseInt(my_line_values[i])){
+							throw new IllegalInferenceException("Bad line reference. " + linetest1.getNum());
+						}
+					}
+					if (Integer.parseInt(testline_values1[i]) != Integer.parseInt(my_line_values[i])){
+						throw new IllegalInferenceException("Bad line reference. " + linetest1.getNum());
+					}
+				}
+			}
+			
+			//stub Need to call a repeat method here. 
+			
 		}else if(op == "print"){
+			
+			if(fun.size() != 1){
+				throw new IllegalLineException("Wrong number of arguments.");
+			}
+			
 			this.toString();
+		
 		}else if(op == "mp" || op == "mt" || op == "co"){
+			
+			if(fun.size() > 4){
+				throw new IllegalLineException("Too many arguments.");
+			}
+			
+			if(fun.size() < 4){
+				throw new IllegalLineException("Too few arguments.");
+			}
 			
 			//Testing what "op" is entered and then testing the line numbers if they correctly reference a line number
 			//in our hashmap.
-			LineNumber linetest1 = new LineNumber((String)fun.get(1));
-			LineNumber linetest2 = new LineNumber((String)fun.get(2));
 			if(!myLineNumbers.containsKey(linetest1) || !myLineNumbers.containsKey(linetest2)){
-				throw new IllegalLineException("Bad line reference");
-			}else{
-				exp1 = (Expression)myLineNumbers.get(linetest1).getLast();
-				exp2 = (Expression)myLineNumbers.get(linetest2).getLast();	
-				test = (Expression)fun.getLast();
+				throw new IllegalInferenceException("Bad line reference. Not a valid linenumber.");
+			}
+			
+			//Splits each line number object based on the placement of the "." and then returns the string in an array form.
+			testline_values1 = linetest1.getNum().split(".");
+			testline_values2 = linetest2.getNum().split(".");
+			my_line_values = valueholder.getNum().split(".");
+			
+			//Tests determining if the linenumber reference itself is a valid reference. Aka, its in the hashmap of our values
+			//but attempts to access a proof it shouldn't be able to access. 
+			
+			
+			//Tests the two entered linenumbers if they have an extra decimal position compared to the current line. Illegal to reference a 
+			// subproof that is already been completed.
+			if (testline_values1.length > my_line_values.length){
+				throw new IllegalInferenceException("Bad line reference. " + linetest1.getNum() + "references an inner proof.");
+			}
+			if(testline_values2.length > my_line_values.length){
+				throw new IllegalInferenceException("Bad line reference. " + linetest2.getNum() + "references an inner proof.");
+			}
+			
+			//If the input line has less decimals than the current line but does not = 1, than the first digits must equal each other. But 
+			// otherwise they must be equal to or less than the value of the current line number at that position.
+			if(testline_values1.length <= my_line_values.length){
+				for (int i = 0; i < testline_values1.length ; i++){
+					if((i+1) == testline_values1.length){
+						if(Integer.parseInt(testline_values1[i]) >= Integer.parseInt(my_line_values[i])){
+							throw new IllegalInferenceException("Bad line reference. " + linetest1.getNum());
+						}
+					}
+					if (Integer.parseInt(testline_values1[i]) != Integer.parseInt(my_line_values[i])){
+						throw new IllegalInferenceException("Bad line reference. " + linetest1.getNum());
+					}
+				}
+			}
+			if(testline_values2.length <= my_line_values.length){
+				for (int i = 0; i < testline_values2.length ; i++){
+					if((i+1) == testline_values2.length){
+						if(Integer.parseInt(testline_values2[i]) >= Integer.parseInt(my_line_values[i])){
+							throw new IllegalInferenceException("Bad line reference. " + linetest2.getNum());
+						}
+					}
+					if (Integer.parseInt(testline_values2[i]) != Integer.parseInt(my_line_values[i])){
+						throw new IllegalInferenceException("Bad line reference. " + linetest2.getNum());
+					}
+				}
+			}
+		
+		
+			exp1 = (Expression)myLineNumbers.get(linetest1).getLast();
+			exp2 = (Expression)myLineNumbers.get(linetest2).getLast();	
+			test = (Expression)fun.getLast();
 			
 			//Calling the particular logic functions based on which "op" is entered.
 			if(op == "mp"){
 				try{
-					Logic.moduspolens(exp1, exp2, test);
+					Logic.moduspollens(exp1, exp2, test);
 				}catch(IllegalInferenceException a){
 					throw a;
 				}
@@ -187,22 +296,43 @@ public class Proof {
 					throw a;
 				}
 			}
-			}
+			
 			
 		}else if(op == "ic"){
-			LineNumber linetest = new LineNumber((String)fun.get(1));
-			if(!myLineNumbers.containsKey(linetest)){
-				throw new IllegalLineException("Bad line reference");
-			}else{
-				exp1 = (Expression)myLineNumbers.get(linetest).getLast();
+			
+			if (fun.size() != 3){
+				throw new IllegalLineException("Wrong number of arguments.");
 			}
+			
+			if(!myLineNumbers.containsKey(linetest1)){
+				throw new IllegalLineException("Bad line reference");
+			}
+			
+			testline_values1 = linetest1.getNum().split(".");
+			my_line_values = valueholder.getNum().split(".");
+			
+			if (testline_values1.length > my_line_values.length){
+				throw new IllegalInferenceException("Bad line reference. " + linetest1.getNum() + "references an inner proof.");
+			}
+			if(testline_values1.length <= my_line_values.length){
+				for (int i = 0; i < testline_values1.length ; i++){
+					if((i+1) == testline_values1.length){
+						if(Integer.parseInt(testline_values1[i]) >= Integer.parseInt(my_line_values[i])){
+							throw new IllegalInferenceException("Bad line reference. " + linetest1.getNum());
+						}
+					}
+					if (Integer.parseInt(testline_values1[i]) != Integer.parseInt(my_line_values[i])){
+						throw new IllegalInferenceException("Bad line reference. " + linetest1.getNum());
+					}
+				}
+			}
+			exp1 = (Expression)myLineNumbers.get(linetest1).getLast();
+			
 			try{
 				Logic.construction(exp1, (Expression)fun.getLast());
 			}catch (IllegalInferenceException a){
 				throw a;
 			}
-			
-		}else{
 			
 		}
 	
