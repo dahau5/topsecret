@@ -64,6 +64,29 @@ public class Logic {
 		
 	}
 	
+
+	public static void repeat(LineNumber currentLine, Expression exp1) {
+		// repeat can be used to repeat any line that the current line is allowed to reference, other than the 1st.
+		// proof checker should just copy the expression from that line into the statement at the current line number.
+		// throw InferenceError if accessing a line inside of a subproof outside of a subproof
+		// All repeat does is copy the expression of an accessible line into the current line.
+		// i.e. 3 repeat 2.1 p ------- throws error. 
+		String line = currentLine.myNumber; //Get currentLines Line Number.
+		if(line.equals("1")) { //if trying to access the first line throw an exception [ 3 repeat 1 p ]
+			throw new IllegalInferenceException("Repeat is not allowed to access First Line of a proof");
+		}
+		// 3 repeat 2 p
+		// line == 2, expr == p
+		if (exp1.myname != myLineNumbers.get(line).getLast()) { //check to make sure repeat is referring to correct expression.
+			throw new IllegalInferenceException("Repeat expression " + exp1.myname + "does not match expression " + myLineNumbers.get(line).getLast());
+		}
+		else {
+			exp1 = myLineNumbers.get(line).getLast(); //copy expression at referenced line into current expression.
+		}
+
+
+	}	
+	
 	public static void moduspolens (Expression exp1, Expression exp2, Expression test)
 		throws IllegalLineException {
 		// from exp1 and (exp1=>exp2)exp2,  test is true
