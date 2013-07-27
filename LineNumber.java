@@ -2,26 +2,20 @@ import java.util.*;
 
 public class LineNumber {
 
-  private static String myNumber;
-  private static Stack<Expression> exprStack;
+  private String myNumber;
+  private Stack<Expression> expr;
+  public Expression firstShow;
+  private boolean showCount = true;
 
 	public LineNumber(String num) {
 		myNumber = num;
-		exprStack = new Stack<Expression>();
+		expr = new Stack<Expression>();
 	}
-	
-	
-	public String getNum(){
-		return myNumber;
-	}
-	
-	
-	
-	
-	public static LineNumber nextlinenumber_helper(String op, Expression provenExpr){
 
-		int index = 0; // Used for finding '.' in old LineNumber
-
+	public LineNumber nextlinenumber_helper(String op, Expression provenExpr){
+		
+		int index; // Used for finding '.' in old LineNumber
+		
 		// @line is the next proof line, read from InputSource
 		// This will return myNumber + 1 if line does not include "show"
 		// or the line does not prove a previous "show"s expression
@@ -30,27 +24,38 @@ public class LineNumber {
 		//Scanner lineScanner = new Scanner(line); // line = "show (~~p=>p)"
 		//String op = lineScanner.next( ); // op = "show"
 		//provenExpr = lineScanner.next( ); // provenExpr = "(~~p=>p)"
-
+		
 		// Changed by VB, cause the line we are using to determine the next line has already been
 		// added to our potential hashmap. Meaning we just need to input the correct op and exp from the 
 		// hashmap when determining the next line number.
-
+		
 		// if the operation is "print", do nothing
 		if (op.equals("print")) {
-			return new LineNumber(myNumber);
+			return this;
 		}
-
+		
 		// if the operation is "show", then we are entering a subproof
+
+
+		//firstShow boolean, set to true when first show is shown.
+		//false otherwise
+
+
 		if (op.equals("show")) {
-			exprStack.push(provenExpr); //changed to add the expr to the stack rather than the op
+			expr.push(provenExpr); //changed to add the expr to the stack rather than the op
+			if (showCount) {
+				firstShow = new Expression(provenExpr); // First Occurance of show and expression
+				showCount = false;
+			}
 			myNumber = myNumber + ".1"; // 1 becomes 1.1
 			return new LineNumber(myNumber);
 		}
 		// if the operation proves the expression we are trying to show, exit the subproof
 		if (op.equals("ic") || op.equals("mp") || op.equals("co") || op.equals("mt")) {
 			// If the last expression to be shown is proven in this line, end the subproof
-			if (exprStack.pop().isproven) {
 
+			if (expr.pop() == myLineNumbers.get(lastLineNumber).getLast()) {
+				
 				// Find the rightmost decimal and remove it and all that follows it
 				// i.e. 3.2.1 --> 3.2
 				for (int i = myNumber.length(); i >= 0; i--) {  // 3.2.3
