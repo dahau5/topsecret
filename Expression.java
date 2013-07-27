@@ -2,6 +2,7 @@ import java.util.*;
 
 public class Expression {
     
+    /** String representation of Expression */
     public String myname;
     public static String alphabet = "abcdefghijklmnopqrstuvwxyz";
 
@@ -9,7 +10,7 @@ public class Expression {
     /**Expression Tree  */
     public ExprTree exprtree;
 
-    /** Expression constructor. Assumes expression is valid. */
+    /** Expression constructor. Checks validity of syntax in construction of ExprTree. */
     public Expression (String name) throws IllegalLineException {
         myname = name;
         try {
