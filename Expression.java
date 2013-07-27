@@ -171,7 +171,7 @@ public class Expression {
             }
             
             if (i > -1) {
-                throw new IllegalLineException("Constructor had extra () or no operators");
+                throw new IllegalLineException("Constructor had extra () or no central operator");
             }
             return node;
         }
