@@ -52,7 +52,7 @@ public class Proof {
 			str += iter.next().toString();
 			str += "\n";
 		}
-		return ret;
+		return str;
 	}
 
 	public boolean isComplete ( ) {
