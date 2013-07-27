@@ -4,17 +4,15 @@ import java.util.regex.Pattern;
 public class Expression {
     
     public String myname;
-    public boolean isproven;
     public static String alphabet = "abcdefghijklmnopqrstuvwxyz";
 
     
     /**Expression Tree  */
     public ExprTree exprtree;
-	
+
     /** Expression constructor. Assumes expression is valid. */
     public Expression (String name) throws IllegalLineException {
         myname = name;
-        isproven = false;
         try {
         exprtree = new ExprTree(name);
         } catch (IllegalLineException e) {
@@ -29,14 +27,14 @@ public class Expression {
         } catch (IllegalArgumentException e) {
             throw e;
         }
-        return (myname.equals(second.myname)) && isproven == second.isproven
-                && treeEquals(exprtree, second.exprtree);
+        return (myname.equals(second.myname)
+                && exprtree.equals(second.exprtree));
     }
-        
 
-	
+
+
     /**Binary Tree split along implications or logical operators (&, |, ~) */
-    static class ExprTree {
+    public static class ExprTree {
 
         ExprTreeNode myRoot;
         
@@ -46,6 +44,28 @@ public class Expression {
             }
             throw new IllegalLineException("Input null string for expression");
         }
+        
+        public boolean equals(Object obj) {
+        	ExprTree second = (ExprTree) obj;
+        	return treeEquals(this, second);
+        }
+        
+        public static boolean treeEquals(ExprTree tree1, ExprTree tree2){
+    		if (tree1.myRoot == null || tree2.myRoot == null){
+    			throw new IllegalArgumentException("Can't use a null tree");
+    		} return treeEqualshelper(tree1.myRoot, tree2.myRoot);
+    	}
+    	
+    	private static boolean treeEqualshelper(ExprTreeNode node1, ExprTreeNode node2){
+    		if(node1 == null && node2 == null){
+    			return true;
+    		}
+    		if(!(node1.myItem.equals(node2))){
+    			return false;
+    		}
+    		return treeEqualshelper(node1.getleft(), node2.getleft()) && treeEqualshelper(node1.getright(), node2.getright());
+        
+    	}
         
         /** Parses a string to create an expression tree that forks based on
          * operators (=> & | ~) and has leaves of single variables.
@@ -117,7 +137,7 @@ public class Expression {
         
         
         /**Nodes of the expression tree. Contain only Strings */
-        static class ExprTreeNode {
+        public static class ExprTreeNode {
             
             /** The item held at this node. */
             private String myItem;
@@ -151,7 +171,5 @@ public class Expression {
                 return myrightchild;
             }
         }
-        
     }
-	
 }
