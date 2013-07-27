@@ -4,6 +4,7 @@ import java.util.*;
 public class Proof {
 	
 	public static LineNumber lastLineNumber;
+	private ArrayList<String> proofSteps;
 	LinkedList<Object> myLinkedList;
 	TheoremSet mytheorems;
 	LineNumber valueholder = new LineNumber("1");
@@ -12,6 +13,7 @@ public class Proof {
 
 	public Proof (TheoremSet theorems) {
 		mytheorems = theorems;
+		proofSteps = new ArrayList<String>();
 	}
 
 	public LineNumber nextLineNumber ( ) {
@@ -38,16 +40,26 @@ public class Proof {
 		}catch (IllegalInferenceException a){
 			System.err.println(a.getMessage());
 		}
-		
+		proofStep.add(x);
+
 		myLineNumbers.put(lastLineNumber, myLinkedList);
 	}
 
 	public String toString ( ) {
-		return "";
+		String str = "";
+		Iterator<String> iter = proofStep.iterator();
+		while (iter.hasNext()){
+			str += iter.next().toString();
+			str += "\n";
+		}
+		return ret;
 	}
 
 	public boolean isComplete ( ) {
-		return true;
+		if (LineNumber.firstShow == (Expression) myLineNumbers.get(lastLineNumber).getLast()) {
+			return true;
+		}
+		return false;
 	}
 	
 	public LinkedList<Object> inputstringparser(String x) throws IllegalLineException, IllegalInferenceException{
