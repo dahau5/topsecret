@@ -1,12 +1,4 @@
-// The methods associated with the different logical
-// inferences. Evaluating 
-
-//linemap
-//datamap
-
-//Not current as of 11:40pm July 26th
-
-import javax.swing.tree.TreeNode;
+//import javax.swing.tree.TreeNode;
 
 
 // The methods associated with the different logical
@@ -22,143 +14,102 @@ public class Logic {
 		
 	}
 	
-	public boolean treeEquals(tree tree1, tree tree2){
-		if (tree1.myRoot == null || tree2.myRoot == null){
-			throw new IllegalArgumentException("Can't use a null tree");
-		} return treeEqualshelper(tree1.myRoot, tree2.myRoot);
-	}
 	
-	private boolean treeEqualshelper(TreeNode node1, TreeNode node2){
-		if(node1 == null && node2 == null){
-			return true;
-		}
-		if(!(node1.myitem.equals(node2))){
-			return false;
-		}
-		return treeEqualshelper(node1.myLeft, node2.myLeft) && treeEqualshelper(node1.myRight, node2.myRight);
-	}
-	
-	public static void assume(Expression exp1, LineNumber myLine){
-		// yay pseudo code. So I need to check if the exp1 is the myTree.myleft of the expression
-		// tied to the previous line number (its own line number with the last number taken off
-		int index;
-		String temp = myLine.myNumber;
-		if (temp.length()>1){
-			for (int i = myLine.myNumber.length()-1; i>0 ; i--){
-				if (myLine.myNumber.get(i) == "."){
-					index = i;
-					break;
-				}
+	public static void assume(Expression exp1, String myLine) throws IllegalInferenceException{
+		Expression exp2 = (Expression)Proof.myLineNumbers.get(myLine).getLast();
+		String not = "~" + exp2.myname;
+		if(exp2.exprtree.myRoot.get().equals("&") || exp2.exprtree.myRoot.get().equals("|")){
+			if (!exp1.myname.equals(not)){
+				throw new IllegalInferenceException("Can only infer the '~' of an '&' or '|'.");
 			}
-			temp = myLine.myNumber.substring(0, index);
 		}
-		Expression exp2 = hashmap.get(temp).get(1);
-		if(treeEquals(exp1, exp2.myTree.myLeft)){
-			exp1.isproven = true;
-		}else if(exp1.mystring.startsWith("~") && treeEquals(exp1.myTree, exp2.myTree)){
-			exp1.isproven = true;
+		if(!Expression.ExprTree.treeEqualshelper(exp1.exprtree.myRoot, exp2.exprtree.myRoot.getleft()) || !exp1.myname.equals(not)){
+			throw new IllegalInferenceException("Bad assumption. Assume must either be the left of the previous expr or '~' of the entire expr.");
 		}
-		//need to check if the previous line has a & or a |, in which case
-		//the only acceptable expression is the not of it. Otherwise the left hand statement 
-		//is A-Ok
+		}
 		
-	}
+		
 	
-
-	public static void repeat(LineNumber currentLine, Expression exp1) {
-		// repeat can be used to repeat any line that the current line is allowed to reference, other than the 1st.
-		// proof checker should just copy the expression from that line into the statement at the current line number.
-		// throw InferenceError if accessing a line inside of a subproof outside of a subproof
-		// All repeat does is copy the expression of an accessible line into the current line.
-		// i.e. 3 repeat 2.1 p ------- throws error. 
-		String line = currentLine.myNumber; //Get currentLines Line Number.
-		if(line.equals("1")) { //if trying to access the first line throw an exception [ 3 repeat 1 p ]
-			throw new IllegalInferenceException("Repeat is not allowed to access First Line of a proof");
-		}
-		// 3 repeat 2 p
-		// line == 2, expr == p
-		if (!exp1.myname.equals( (Expression) myLineNumbers.get(line).getLast()) { //check to make sure repeat is referring to correct expression.
-			throw new IllegalInferenceException("Repeat expression " + exp1.myname + "does not match expression " + (Expression) myLineNumbers.get(line).getLast());
-		}
-		else {
-			exp1 = (Expression) myLineNumbers.get(line).getLast(); //copy expression at referenced line into current expression.
-		}
-
-	}	
 	
-	public static void moduspolens (Expression exp1, Expression exp2, Expression test)
-		throws IllegalLineException {
-		// from exp1 and (exp1=>exp2)exp2,  test is true
+	public static void moduspollens (Expression exp1, Expression exp2, Expression test)
+		throws IllegalInferenceException {
+		// from exp1 and (exp1=>exp2),  test(exp2) is true
 		Expression myE1;
 		Expression myE2;
-		if (exp1.mystring.length() < exp2.mystring.length()){
+		if (exp1.myname.length() < exp2.myname.length()){
 			myE1 = exp1;
 			myE2 = exp2;
 		} else {
 			myE1 = exp2;
 			myE2 = exp1;
 		}
-		// I need some way to grab the tree at the right point so as to compare it correctly with 
-		// the input value given to mp. Can't compare the entire expression tree each time modus
-		// polens is called. Unfeasible. 
+		if(!myE2.exprtree.myRoot.get().equals("=>"))
+			throw new IllegalInferenceException("One of the referenced expressions must be an implication.");
 		
-		//The toString is grabbing the string representation of an expression tree of 
-		//the second value given to modus polens. Or the expression that holds both the
-		//assumed statement, and the one we are testing to hold true. Possible that we need to make an expression
-		//tree of each myE2 passed into the modus polens to ensure it is logically sound. Just an idea.
+		if (!Expression.ExprTree.treeEqualshelper(myE1.exprtree.myRoot, myE2.exprtree.myRoot.getleft())){ 
+			throw new IllegalInferenceException("Bad assumption, improper use of mp. "+ myE1.myname + " must equal the left hand side of the second expression.");
 		
-		if (treeEquals(myE1.myTree, myE2.myTree.myLeft)){ 
-			if (treeEquals(myE2.myTree.myRight, test.myTree)){
-				test.isproven = true;
-			}else{
-				throw new IllegalInferenceException("Improper use of mp. " + test + " not in " + myE2);
+		}else if (!Expression.ExprTree.treeEqualshelper(myE2.exprtree.myRoot, test.exprtree.myRoot)){
+				throw new IllegalInferenceException("Bad assumption. Improper use of mp. " + test + " not in " + myE2);
 			}
-		}else{
-			throw new IllegalInferenceException("Improper use of mp. " + myE1 + " not in " + myE2);
-		}
-		//if myE1 the exact same expression as immediately before the 
-		//implication in myE2: then "test.isproven = true"
 	}
 	
-	public static void modustollens (Expression exp1, Expression exp2, Expression test){
+	public static void modustollens (Expression exp1, Expression exp2, Expression test) throws IllegalInferenceException{
 		// ~exp2 and exp1=>exp2(exp1) ~exp1(test) is true
 		Expression myE1;
 		Expression myE2;
-		if (exp1.mystring.length() < exp2.mystring.length()){
+		if (exp1.myname.length() < exp2.myname.length()){
 			myE1 = exp1;
 			myE2 = exp2;
 		} else {
 			myE1 = exp2;
 			myE2 = exp1;
 		}
-		if(myE1.mystring.startsWith("~") && treeEquals(myE1.myTree.myRight, myE2.myTree.myRight)){
-			if(test.mystring.startsWith("~") && treeEquals(test.myTree.myRight, myE2.myTree.myLeft)){
-				test.isproven = true;
-			}
+		if(!myE2.exprtree.myRoot.get().equals("=>"))
+			throw new IllegalInferenceException("One of the referenced expressions must be an implication.");
+		
+		if (!myE1.exprtree.myRoot.get().equals("~") || !test.exprtree.myRoot.get().equals("~")){
+			throw new IllegalInferenceException("To use modus tollens means one of the referenced expressions " +
+					"must be the '~' of the second half of the other expression.");
+		}
+		if (!Expression.ExprTree.treeEqualshelper(test.exprtree.myRoot.getright(), myE2.exprtree.myRoot.getleft())){
+			throw new IllegalInferenceException("Bad assumption. " + test + " must equal left side of the implication.");
+		}
+		if (!Expression.ExprTree.treeEqualshelper(myE1.exprtree.myRoot.getright(), myE2.exprtree.myRoot.getright())){
+			throw new IllegalInferenceException("Bad assumption. " + myE1 + " must equal the left side of the implication.");
 		}
 	}
 	
-	public static void construction (Expression exp1, Expression exp2){
+	//bad. need to fix! Only check is that this show must be the 
+	public static void show (Expression exp1, LineNumber line) throws IllegalInferenceException{
+		
+	}
+	
+	public static void construction (Expression exp1, Expression exp2) throws IllegalInferenceException{
 		// exp2 (exp1 => exp2) for any exp1
 		Expression myE1;
 		Expression myE2;
-		if (exp1.mystring.length() < exp2.mystring.length()){
+		if (exp1.myname.length() < exp2.myname.length()){
 			myE1 = exp1;
 			myE2 = exp2;
 		} else {
 			myE1 = exp2;
 			myE2 = exp1;
 		}
-		if(treeEquals(myE1.myTree, myE2.myTree.myRight)){
-			myE2.isproven = true;
+		if(!Expression.ExprTree.treeEqualshelper(myE1.exprtree.myRoot, myE2.exprtree.myRoot.getright())){
+			throw new IllegalInferenceException(myE1.myname + " must be the right hand side of " + myE2.myname + ".");
 		}
+		
 	}
 	
-	public static void contradiction (Expression exp1, Expression exp2, Expression test){
+	public static void contradiction (Expression exp1, Expression exp2, Expression test) throws IllegalInferenceException{
 		// ~exp1 and exp1 infer ANY EXPRESSION
 		Expression myE1;
 		Expression myE2;
-		if (exp1.mystring.length() < exp2.mystring.length()){
+		if (exp1.myname.length() == exp2.myname.length()){
+			throw new IllegalInferenceException("One expression must be the ~ of the other.");
+		}
+		if (exp1.myname.length() < exp2.myname.length()){
 			myE1 = exp1;
 			myE2 = exp2;
 		} else {
@@ -167,9 +118,16 @@ public class Logic {
 		}
 		//Need to add some check for the 'test' to make sure that the 'test' 
 		//variable is correctly inputted and used by the user.
-		if(myE2.mystring.startsWith("~") && treeEquals(myE1.myTree, myE2.myTree.myRight)){
-			test.isproven = true;
+		if(!myE2.myname.startsWith("~") || !myE1.myname.startsWith("~")){
+			throw new IllegalInferenceException("One expression must be the ~ of the other.");
 		}
+		
+		if(myE2.myname.startsWith("~")){
+			if(!Expression.ExprTree.treeEqualshelper(myE1.exprtree.myRoot, myE2.exprtree.myRoot.getright())){
+				throw new IllegalInferenceException("The expressions must be the same, except for the presence of a '~'.");
+			}
+		}
+				
 		
 }
 }
