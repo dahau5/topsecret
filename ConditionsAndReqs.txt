@@ -109,3 +109,6 @@ NOTES ON REPEAT:
 		3 repeat 2 (p=>p)
 		
 		^ If the above example contained three "show (p=>p)" statements, 
+
+CHECKLIST:
+	Make sure every method and variable has the appropriate access tag (package/private/public etc.)

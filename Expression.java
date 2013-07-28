@@ -139,10 +139,17 @@ public class Expression {
                 }
                 if (currentchar == '(') {
                     parencount ++;
+<<<<<<< HEAD
                     i ++;
                 } else if (currentchar == ')') {
                     parencount --;
                     i ++;
+=======
+                   
+                } else if (currentchar == ')') {
+                    parencount --;
+                   
+>>>>>>> Added toString() to ExprTreeNode
                 // Assumes you've reached the '>' in "=>"
                 } else if (currentchar == '>' && s.charAt(i-1) == '=' && parencount == 0) {
                     node.myItem = "=>";
@@ -238,6 +245,36 @@ public class Expression {
             public ExprTreeNode getright() {
                 return myright;
             }
+<<<<<<< HEAD
         }
     }
 }
+=======
+            
+            
+            // Reassembles a String of a full expression from its
+            // root down
+            public String toString() {
+            	if (myItem == null) {
+            		return "";
+            	}
+            	else if (myleft == null && myright == null) {
+            		return myItem;
+            	}
+            	else if (myItem.equals("~")) {
+            		return myItem + myright.toString();
+            	}
+            	else if (myright == null) {
+            		return "(" + myleft.toString() + myItem + ")";
+            	}
+            	else if (myleft == null) {
+            		return "(" + myItem + myright.toString() + ")";
+            	}
+            	else {
+            		return "(" + myleft.toString() + myItem + myright.toString() + ")";
+            	}
+            }
+        }
+    }
+}
+>>>>>>> Added toString() to ExprTreeNode

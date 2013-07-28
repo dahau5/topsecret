@@ -24,7 +24,11 @@ public class ProofTest {
 		boolean errored = false;
 		Proof proof = new Proof(new TheoremSet());
 		proof.nextLineNumber();
+<<<<<<< HEAD
 		
+=======
+
+>>>>>>> Added toString() to ExprTreeNode
 		try{
 			proof.extendProof("show (a=>b)");
 		}catch(IllegalLineException e){
@@ -33,7 +37,11 @@ public class ProofTest {
 			errored = true;
 		}
 		proof.nextLineNumber();
+<<<<<<< HEAD
 		
+=======
+
+>>>>>>> Added toString() to ExprTreeNode
 		try{
 			proof.extendProof("assume a");
 		}catch(IllegalLineException e){
@@ -42,7 +50,11 @@ public class ProofTest {
 			errored = true;
 		}
 		proof.nextLineNumber();
+<<<<<<< HEAD
 		
+=======
+
+>>>>>>> Added toString() to ExprTreeNode
 		try{
 			proof.extendProof("show b");
 		}catch(IllegalLineException e){
@@ -50,11 +62,19 @@ public class ProofTest {
 		}catch(IllegalInferenceException a){
 			errored = true;
 		}
+<<<<<<< HEAD
 		
 		//System.out.println(proof.proofSteps.get(2));
 		//System.out.println(proof.myLineNumbers.get(new LineNumber("1")));
 		//System.out.println(proof.myLineNumbers.get(new LineNumber("2")));
 		
+=======
+
+		//System.out.println(proof.proofSteps.get(2));
+		//System.out.println(proof.myLineNumbers.get(new LineNumber("1")));
+		//System.out.println(proof.myLineNumbers.get(new LineNumber("2")));
+
+>>>>>>> Added toString() to ExprTreeNode
 		LineNumber test = new LineNumber("2");
 		assertFalse(errored);
 		//assertTrue(proof.myLineNumbers.containsKey(test));
@@ -64,7 +84,11 @@ public class ProofTest {
 		assertEquals(proof.myLineNumbers.get("2").get(0), copy.get(0));
 		assertEquals(proof.myLineNumbers.get("2").get(1), copy.get(1));
 	}
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> Added toString() to ExprTreeNode
 	//Test that a correctly formatted proof with a single sub proof throws no errors. 
 	@Test
 	public void subprooftest(){
@@ -130,11 +154,19 @@ public class ProofTest {
 			errored = true;
 		}
 		System.out.println(proof1.proofSteps.get(5));
+<<<<<<< HEAD
 		
 		assertFalse(errored);
 		assertTrue(proof1.isComplete());
 	}
 	
+=======
+
+		assertFalse(errored);
+		assertTrue(proof1.isComplete());
+	}
+
+>>>>>>> Added toString() to ExprTreeNode
 	//Test asserting that the a proof with multiple sub proofs throws no errors. 
 	@Test
 	public void multiple_sub_proof_test(){
@@ -452,6 +484,8 @@ public class ProofTest {
 			errored = true;
 		}catch(IllegalInferenceException a){
 			errored = true;
+<<<<<<< HEAD
+=======
 		}
 		assertTrue(errored);;
 
@@ -629,11 +663,192 @@ public class ProofTest {
 			errored = true;
 		}catch(IllegalInferenceException a){
 			errored = true;
+>>>>>>> Added toString() to ExprTreeNode
 		}
 		assertTrue(errored);;
 
 	}
 
+<<<<<<< HEAD
+	// Test that an IllegalLineException is thrown when
+	// Repeat has illegal argument order <repeat <expr> linenumber <expr>> 
+	@Test
+	public void extendProofRepeatIncorrectArgsTest() {
+		boolean errored = false;
+
+		Proof proof = new Proof(new TheoremSet());
+
+		try {
+			proof.extendProof("repeat <expr> linenumber <expr>");
+		} catch(IllegalLineException e) {
+			errored = true;
+		}catch(IllegalInferenceException a){
+			errored = true;
+		}
+		assertTrue(errored);;
+
+	}
+
+	// Test that an IllegalLineException is thrown when
+	// Repeat has missing line number <repeat <expr> <expr> <expr>> 
+	@Test
+	public void extendProofRepeatMissingLineNumberTest() {
+		boolean errored = false;
+
+		Proof proof = new Proof(new TheoremSet());
+
+		try {
+			proof.extendProof("repeat <expr> <expr> <expr>");
+		} catch(IllegalLineException e) {
+			errored = true;
+		}catch(IllegalInferenceException a){
+			errored = true;
+		}
+		assertTrue(errored);;
+
+	}
+
+	/* PRINT-SPECIFIC TEST CASES */
+
+	// Test that an IllegalLineException is thrown when
+	// Print has too many args <print expr> 
+	@Test
+	public void extendProofPrintIncorrectArgsTest() {
+		boolean errored = false;
+
+		Proof proof = new Proof(new TheoremSet());
+
+		try {
+			proof.extendProof("print <expr>");
+		} catch(IllegalLineException e) {
+			errored = true;
+		}catch(IllegalInferenceException a){
+			errored = true;
+		}
+		assertTrue(errored);;
+
+	}
+
+	/* MC-SPECIFIC TEST CASES */
+
+	// Test that an IllegalLineException is thrown when
+	// MC has too many args <mc linenumber linenumber linenumber proof> 
+	@Test
+	public void extendProofMPIncorrectArgsTest() {
+		boolean errored = false;
+
+		Proof proof = new Proof(new TheoremSet());
+
+		try {
+			proof.extendProof("mp linenumber linenumber linenumber <expr>");
+		} catch(IllegalLineException e) {
+			errored = true;
+		}catch(IllegalInferenceException a){
+			errored = true;
+		}
+		assertTrue(errored);;
+
+	}
+
+	// Test that an IllegalLineException is thrown when
+	// MC has too few args <mc linenumber proof> 
+	@Test
+	public void extendProofMPTooFewArgsTest() {
+		boolean errored = false;
+
+		Proof proof = new Proof(new TheoremSet());
+
+		try {
+			proof.extendProof("mp linenumber <expr>");
+		} catch(IllegalLineException e) {
+			errored = true;
+		}catch(IllegalInferenceException a){
+			errored = true;
+		}
+		assertTrue(errored);;
+
+	}
+
+	// Test that an IllegalLineException is thrown when
+	// MC has no args <mc > 
+	@Test
+	public void extendProofMPnoArgsTest() {
+		boolean errored = false;
+
+		Proof proof = new Proof(new TheoremSet());
+
+		try {
+			proof.extendProof("mp ");
+		} catch(IllegalLineException e) {
+			errored = true;
+		}catch(IllegalInferenceException a){
+			errored = true;
+		}
+		assertTrue(errored);;
+
+	}
+
+	/* MT-SPECIFIC TEST CASES */
+
+	// Test that an IllegalLineException is thrown when
+	// MT has too many args <mt linenumber linenumber linenumber proof> 
+	@Test
+	public void extendProofMTIncorrectArgsTest() {
+		boolean errored = false;
+
+		Proof proof = new Proof(new TheoremSet());
+
+		try {
+			proof.extendProof("mt linenumber linenumber linenumber <expr>");
+		} catch(IllegalLineException e) {
+			errored = true;
+		}catch(IllegalInferenceException a){
+			errored = true;
+		}
+		assertTrue(errored);;
+
+	}
+
+	// Test that an IllegalLineException is thrown when
+	// MT has too few args <mt linenumber proof> 
+	@Test
+	public void extendProofMTtooFewArgsTest2() {
+		boolean errored = false;
+
+		Proof proof = new Proof(new TheoremSet());
+
+		try {
+			proof.extendProof("mt linenumber <expr>");
+		} catch(IllegalLineException e) {
+			errored = true;
+		}catch(IllegalInferenceException a){
+			errored = true;
+		}
+		assertTrue(errored);;
+
+	}
+
+	// Test that an IllegalLineException is thrown when
+	// MC has no args <mc > 
+	@Test
+	public void extendProofMTnoArgsTest1() {
+		boolean errored = false;
+
+		Proof proof = new Proof(new TheoremSet());
+
+		try {
+			proof.extendProof("mt ");
+		} catch(IllegalLineException e) {
+			errored = true;
+		}catch(IllegalInferenceException a){
+			errored = true;
+		}
+		assertTrue(errored);;
+
+	}
+
+=======
+>>>>>>> Added toString() to ExprTreeNode
 	/* CO-SPECIFIC TEST CASES */
 
 	// Test that an IllegalLineException is thrown when

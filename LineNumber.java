@@ -36,15 +36,50 @@ public class LineNumber {
 		//System.out.println(provenExpr.myname + " : I am the expression passed into nextline_helper.");
 		//System.out.println(previousline + " : I am the previous line number passed into nextline_helper.");
 
+<<<<<<< HEAD
+=======
+	public String getNum(){
+		return myNumber;
+	}
+
+	public boolean equals(Object obj){
+		LineNumber test = (LineNumber) obj;
+		if (this.myNumber.equals(test.getNum())){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	public Expression getfirstshow(){
+		return firstShow;
+	}
+
+
+
+	public LineNumber nextlinenumber_helper(String op, Expression provenExpr, String previousline){
+
+		int index = 0; // Used for finding '.' in old LineNumber
+		//System.out.println(op + " : I am the operation passed into nextline_helper.");
+		//System.out.println(provenExpr.myname + " : I am the expression passed into nextline_helper.");
+		//System.out.println(previousline + " : I am the previous line number passed into nextline_helper.");
+
+>>>>>>> Added toString() to ExprTreeNode
 		// @line is the next proof line, read from InputSource
 		// This will return myNumber + 1 if line does not include "show"
 		// or the line does not prove a previous "show"s expression
 		// If it is a show, concatenate ".1" to the current line number
 
 		// if the operation is "print", do nothing
+<<<<<<< HEAD
 		
 		myNumber = previousline;
 		
+=======
+
+		myNumber = previousline;
+
+>>>>>>> Added toString() to ExprTreeNode
 		if (op.equals("print")) {
 			return null;
 		}
@@ -71,6 +106,7 @@ public class LineNumber {
 		}
 		// if the operation proves the expression we are trying to show, exit the subproof
 		if (op.equals("ic") || op.equals("mp") || op.equals("co") || op.equals("mt")) {
+<<<<<<< HEAD
 			
 			//System.out.println(Proof.expr.firstElement().myname);
 			// If the last expression to be shown is proven in this line, end the subproof
@@ -85,6 +121,22 @@ public class LineNumber {
 				
 				Proof.expr.pop();
 				
+=======
+
+			//System.out.println(Proof.expr.firstElement().myname);
+			// If the last expression to be shown is proven in this line, end the subproof
+
+			//If the top element of the stack is equal to the proven expr input, continue. 
+			//Use expression equals method because they are still expression objects and not
+			//strings.
+
+			if (provenExpr.equals(Proof.expr.lastElement())) {
+
+				//System.out.println("I made it here!!!!");
+
+				Proof.expr.pop();
+
+>>>>>>> Added toString() to ExprTreeNode
 				// Find the rightmost decimal and remove it and all that follows it
 				// i.e. 3.2.1 --> 3.2
 				for (int i = myNumber.length()-1; i >= 0; i--) {  // 3.2.3
@@ -94,9 +146,15 @@ public class LineNumber {
 					}
 				}
 				myNumber = myNumber.substring(0, index); // 3.2
+<<<<<<< HEAD
 				
 				//System.out.println(myNumber);
 				
+=======
+
+				//System.out.println(myNumber);
+
+>>>>>>> Added toString() to ExprTreeNode
 				// increment the number following the rightmost decimal
 				// 3.2 --> 3.3
 				// Find the new rightmost decimal
@@ -104,7 +162,11 @@ public class LineNumber {
 					int newnum = Integer.parseInt(myNumber) + 1;
 					myNumber = newnum + "";
 				}else{
+<<<<<<< HEAD
 				
+=======
+
+>>>>>>> Added toString() to ExprTreeNode
 					for (int i = myNumber.length()-1; i >= 0; i--) {
 						if (myNumber.charAt(i) == '.') {
 							index = i;
