@@ -3,89 +3,109 @@ import java.util.*;
 public class LineNumber {
 
   private String myNumber;
-  private Stack<Expression> expr;
   public Expression firstShow;
-  private boolean showCount = true;
+  private boolean isinitialized = false;
 
 	public LineNumber(String num) {
 		myNumber = num;
-		expr = new Stack<Expression>();
 	}
+	
+	public String getNum(){
+		return myNumber;
+	}
+	
+	public boolean equals(Object obj){
+		LineNumber test = (LineNumber) obj;
+		if (this.myNumber.equals(test.getNum())){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public Expression getfirstshow(){
+		return firstShow;
+	}
+	
 
-	public LineNumber nextlinenumber_helper(String op, Expression provenExpr){
-		
-		int index; // Used for finding '.' in old LineNumber
-		
+
+	public LineNumber nextlinenumber_helper(String op, Expression provenExpr, String previousline){
+
+		int index = 0; // Used for finding '.' in old LineNumber
+		//System.out.println(op + " : I am the operation passed into nextline_helper.");
+		//System.out.println(provenExpr.myname + " : I am the expression passed into nextline_helper.");
+		//System.out.println(previousline + " : I am the previous line number passed into nextline_helper.");
+
 		// @line is the next proof line, read from InputSource
 		// This will return myNumber + 1 if line does not include "show"
 		// or the line does not prove a previous "show"s expression
 		// If it is a show, concatenate ".1" to the current line number
 
-		//Scanner lineScanner = new Scanner(line); // line = "show (~~p=>p)"
-		//String op = lineScanner.next( ); // op = "show"
-		//provenExpr = lineScanner.next( ); // provenExpr = "(~~p=>p)"
-		
-		// Changed by VB, cause the line we are using to determine the next line has already been
-		// added to our potential hashmap. Meaning we just need to input the correct op and exp from the 
-		// hashmap when determining the next line number.
-		
 		// if the operation is "print", do nothing
-		if (op.equals("print")) {
-			return this;
-		}
 		
+		myNumber = previousline;
+		
+		if (op.equals("print")) {
+			return null;
+		}
+
 		// if the operation is "show", then we are entering a subproof
 
 
-		//firstShow boolean, set to true when first show is shown.
-		//false otherwise
-
-
 		if (op.equals("show")) {
-			expr.push(provenExpr); //changed to add the expr to the stack rather than the op
-			if (showCount) {
-				firstShow = new Expression(provenExpr); // First Occurance of show and expression
-				showCount = false;
+			Proof.expr.push(provenExpr); //changed to add the expr to the stack rather than the op
+			if(Proof.expr.empty()){
+				System.out.println("The stack is empty!");
+			}
+			if (Proof.myLineNumbers.size() == 1) {
+				try{
+					firstShow = new Expression(provenExpr.myname); // First occurence of show and expression
+				}catch (IllegalLineException e){
+					System.err.println(e.getMessage());
+				}
+				myNumber = "2";
+				return new LineNumber(myNumber);
 			}
 			myNumber = myNumber + ".1"; // 1 becomes 1.1
 			return new LineNumber(myNumber);
 		}
 		// if the operation proves the expression we are trying to show, exit the subproof
 		if (op.equals("ic") || op.equals("mp") || op.equals("co") || op.equals("mt")) {
+			
+			//System.out.println(Proof.expr.firstElement().myname);
 			// If the last expression to be shown is proven in this line, end the subproof
-
-			if (expr.pop() == myLineNumbers.get(lastLineNumber).getLast()) {
+			
+			//If the top element of the stack is equal to the proven expr input, continue. 
+			//Use expression equals method because they are still expression objects and not
+			//strings.
+			
+			if (provenExpr.equals(Proof.expr.lastElement())) {
+				
+				//System.out.println("I made it here!!!!");
+				
+				Proof.expr.pop();
 				
 				// Find the rightmost decimal and remove it and all that follows it
 				// i.e. 3.2.1 --> 3.2
-				for (int i = myNumber.length(); i >= 0; i--) {  // 3.2.3
+				for (int i = myNumber.length()-1; i >= 0; i--) {  // 3.2.3
 					if (myNumber.charAt(i) == '.') {
 						index = i;
 						break;
 					}
 				}
 				myNumber = myNumber.substring(0, index); // 3.2
+				
+				//System.out.println(myNumber);
+				
 				// increment the number following the rightmost decimal
 				// 3.2 --> 3.3
 				// Find the new rightmost decimal
-				for (int i = myNumber.length(); i >= 0; i--) {
-					if (myNumber.charAt(i) == '.') {
-						index = i;
-						break;
-					}
-				}
-				// Convert the string to the right of the rightmost decimal to an integer
-				// increment it, convert it back to a string and concatenate to myNumber
-				int newRight = Integer.parseInt(myNumber.substring(index + 1, myNumber.length())) + 1; // newRight = "3"
-				myNumber = myNumber.substring(0, index + 1) + newRight + ""; // myNumber.substring(0, index + 1) = "3."
-                // myNumber = "3.3"
-
-			}
-		}
-		else {
-			// Increment the digit(s) following the last decimal of myNumber if it has one
-			if (myNumber.contains(".")) {
-				for (int i = myNumber.length(); i >= 0; i--) {
+				if(!myNumber.contains(".")){
+					int newnum = Integer.parseInt(myNumber) + 1;
+					myNumber = newnum + "";
+				}else{
+				
+					for (int i = myNumber.length()-1; i >= 0; i--) {
 						if (myNumber.charAt(i) == '.') {
 							index = i;
 							break;
@@ -93,12 +113,33 @@ public class LineNumber {
 					}
 					// Convert the string to the right of the rightmost decimal to an integer
 					// increment it, convert it back to a string and concatenate to myNumber
-					int newRight = Integer.parseInt(myNumber.substring(index + 1, myNumber.length())) + 1;
-					myNumber += newRight + "";
+					int newRight = Integer.parseInt(myNumber.substring(index, myNumber.length())) + 1; // newRight = "3"
+					String temp = myNumber.substring(0, index);
+					myNumber = myNumber.substring(0, index + 1) + newRight + ""; // myNumber.substring(0, index + 1) = "3."
+					// myNumber = "3.3"
+				}
+			}
+		}
+		else {
+			// Increment the digit(s) following the last decimal of myNumber if it has one
+			if (myNumber.contains(".")) {
+				for (int i = myNumber.length()-1; i >= 0; i--) {
+						if (myNumber.charAt(i) == '.') {
+							index = i;
+							break;
+						}
+					}
+					// Convert the string to the right of the rightmost decimal to an integer
+					// increment it, convert it back to a string and concatenate to myNumber
+					int newRight = Integer.parseInt(myNumber.substring(index+1, myNumber.length())) + 1;
+					String temp = myNumber.substring(0, index+1);
+					myNumber = temp + newRight + "";
 			}
 			// If myNumber contains no decimals, simply increment it by 1
 			else {
-				myNumber = (Integer.parseInt(myNumber) + 1) + "";
+				//System.out.println(myNumber);
+				int num = Integer.parseInt(myNumber);
+				myNumber = (num + 1) + "";
 			}
 		}
 		return new LineNumber(myNumber);
