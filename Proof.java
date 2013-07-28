@@ -79,7 +79,7 @@ public class Proof {
 	}
 
 	public boolean isComplete ( ) {
-		if (valueholder.firstShow == (Expression) myLineNumbers.get(lastLineNumber).getLast()) {
+		if (valueholder.getfirstshow().equals((Expression) myLineNumbers.get(lastLineNumber).getLast())) {
 			return true;
 		}
 		return false;
