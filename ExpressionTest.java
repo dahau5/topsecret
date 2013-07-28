@@ -151,5 +151,6 @@ public class ExpressionTest {
 		}
 		Expression.ExprTree.ExprTreeNode node6 = ex6.exprtree.myRoot;
 		assertEquals(node6.toString(), "((~a=>b)=>(c=>~(d=>~(e=>(f=>~g)))))");
+	}
 
 }
