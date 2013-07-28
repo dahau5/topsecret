@@ -6,7 +6,7 @@ import org.junit.Test;
 public class LineNumberTest {
   
 	/* GENERAL TEST CASES */
-	
+
 	// Assert than an IllegalLineException is thrown when
 	// line does not hold anything but whitespace
 
@@ -22,87 +22,91 @@ public class LineNumberTest {
 	4 ic 3 (p=>((p=>q)=>q)) */
 
 	@Test
+	
+	//After first show, line number changes to 2, not 1.1
 	public void genericTest() {
+		Expression expr = null;
 		String err = "";
 		LineNumber lineNum = new LineNumber("1");
-		Expression expr = new Expression("p");
-
-		try {
-			lineNum.nextlinenumber_helper("show", expr);
-		} catch(IllegalLineException e) {
+		try{
+			expr = new Expression("p");
+		}catch(IllegalLineException e){
 			err = e.getMessage();
 		}
-		assertEquals(lineNum.myNumber, "2");
+		lineNum.nextlinenumber_helper("show", expr);
+		assertEquals(lineNum.getNum(), "2");
 	}
 
 	@Test
 	public void showLineTest() {
+		Expression expr = null;
 		String err = "";
 		LineNumber lineNum = new LineNumber("3");
-		Expression expr = new Expression("((p=>q)=>q)");
-
 		try {
-			lineNum.nextlinenumber_helper("show", expr);
+			expr = new Expression("((p=>q)=>q)");
 		} catch(IllegalLineException e) {
 			err = e.getMessage();
 		}
-		assertEquals(lineNum.myNumber, "3.1");
+		lineNum.nextlinenumber_helper("show", expr);
+		assertEquals(lineNum.getNum(), "3.1");
 	}
 
 	@Test
 	public void showLine2Test() {
 		String err = "";
 		LineNumber lineNum = new LineNumber("3.1");
-		Expression expr = new Expression("(p=>q)");
+		Expression expr = null; 
 
 		try {
-			lineNum.nextlinenumber_helper("assume", expr);
+			expr = new Expression("(p=>q)");
 		} catch(IllegalLineException e) {
 			err = e.getMessage();
 		}
-		assertEquals(lineNum.myNumber, "3.2");
+		lineNum.nextlinenumber_helper("assume", expr);
+		assertEquals(lineNum.getNum(), "3.2");
 	}
 
 	@Test
 	public void showLine3Test() {
 		String err = "";
 		LineNumber lineNum = new LineNumber("3.2");
-		Expression expr = new Expression("q");
-
+		Expression expr = null;
 		try {
-			lineNum.nextlinenumber_helper("show", expr);
+			 expr = new Expression("q");
+
 		} catch(IllegalLineException e) {
 			err = e.getMessage();
 		}
-		assertEquals(lineNum.myNumber, "3.2.1");
+		lineNum.nextlinenumber_helper("show", expr);
+		assertEquals(lineNum.getNum(), "3.2.1");
 	}
 
 	@Test
 	public void showLine4Test() {
 		String err = "";
 		LineNumber lineNum = new LineNumber("3.2.1");
-		Expression expr = new Expression("q");
-
+		Expression expr = null;
 		try {
-			lineNum.nextlinenumber_helper("mp 2 3.1", expr);
+			 expr = new Expression("q");
 		} catch(IllegalLineException e) {
 			err = e.getMessage();
 		}
-		assertEquals(lineNum.myNumber, "3.3");
+		lineNum.nextlinenumber_helper("mp 2 3.1", expr);
+		assertEquals(lineNum.getNum(), "3.3");
 	}
 
 	@Test
 	public void showLine5Test() {
 		String err = "";
 		LineNumber lineNum = new LineNumber("3.3");
-		Expression expr = new Expression("((p=>q)=>q)");
-
+		Expression expr = null;
 		try {
-			lineNum.nextlinenumber_helper("ic 3.2", expr);
+			 expr = new Expression("((p=>q)=>q)");
 		} catch(IllegalLineException e) {
 			err = e.getMessage();
 		}
-		assertEquals(lineNum.myNumber, "4");
+		lineNum.nextlinenumber_helper("ic 3.2", expr);
+		assertEquals(lineNum.getNum(), "4");
 	}
 
 
@@ -112,14 +116,14 @@ public class LineNumberTest {
 	public void showLine6Test() {
 		String err = "";
 		LineNumber lineNum = new LineNumber("3.9");
-		Expression expr = new Expression("(p=>q)");
-
+		Expression expr = null;
 		try {
-			lineNum.nextlinenumber_helper("assume", expr);
+			 expr = new Expression("(p=>q)");
 		} catch(IllegalLineException e) {
 			err = e.getMessage();
 		}
-		assertEquals(lineNum.myNumber, "3.10");
+		lineNum.nextlinenumber_helper("assume", expr);
+		assertEquals(lineNum.getNum(), "3.10");
 	}
 
 	// Make sure nextlinenumber_helper can properly remove
@@ -129,14 +133,14 @@ public class LineNumberTest {
 	public void showLine7Test() {
 		String err = "";
 		LineNumber lineNum = new LineNumber("3.2.10");
-		Expression expr = new Expression("q");
-
+		Expression expr = null;
 		try {
-			lineNum.nextlinenumber_helper("mp 2 3.2.5", expr);
+			 expr = new Expression("q");
 		} catch(IllegalLineException e) {
 			err = e.getMessage();
 		}
-		assertEquals(lineNum.myNumber, "3.3");
+		lineNum.nextlinenumber_helper("mp 2 3.2.5", expr);
+		assertEquals(lineNum.getNum(), "3.3");
 	}
 
 
