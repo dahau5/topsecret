@@ -58,7 +58,7 @@ public class Expression {
             } return treeEqualshelper(tree1.myRoot, tree2.myRoot);
         }
         
-        private static boolean treeEqualshelper(ExprTreeNode node1, ExprTreeNode node2){
+        public static boolean treeEqualshelper(ExprTreeNode node1, ExprTreeNode node2){
             if(node1 == null && node2 == null){
                 return true;
             }
