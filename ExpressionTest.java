@@ -79,5 +79,77 @@ public class ExpressionTest {
         
         
     }
+    
+        @Test
+	public void nodeToStringTest() {
+		Expression ex = null;
+		try {
+			ex = new Expression("~a");
+		}
+		catch(IllegalLineException e) {
+			System.out.println(e.getMessage());
+		}
+		Expression.ExprTree.ExprTreeNode node = ex.exprtree.myRoot;
+		assertEquals(node.toString(), "~a");
+		
+		Expression ex1 = null;
+		try {
+			ex1 = new Expression("a");
+		}
+		catch(IllegalLineException e) {
+			System.out.println(e.getMessage());
+		}
+		Expression.ExprTree.ExprTreeNode node1 = ex1.exprtree.myRoot;
+		assertEquals(node1.toString(), "a");
+		
+		Expression ex2 = null;
+		try {
+			ex2 = new Expression("(a=>b)");
+		}
+		catch(IllegalLineException e) {
+			System.out.println(e.getMessage());
+		}
+		Expression.ExprTree.ExprTreeNode node2 = ex2.exprtree.myRoot;
+		assertEquals(node2.toString(), "(a=>b)");
+		
+		Expression ex3 = null;
+		try {
+			ex3 = new Expression("((a=>b)=>c)");
+		}
+		catch(IllegalLineException e) {
+			System.out.println(e.getMessage());
+		}
+		Expression.ExprTree.ExprTreeNode node3 = ex3.exprtree.myRoot;
+		assertEquals(node3.toString(), "((a=>b)=>c)");
+		
+		Expression ex4 = null;
+		try {
+			ex4 = new Expression("((a=>b)=>(c=>d))");
+		}
+		catch(IllegalLineException e) {
+			System.out.println(e.getMessage());
+		}
+		Expression.ExprTree.ExprTreeNode node4 = ex4.exprtree.myRoot;
+		assertEquals(node4.toString(), "((a=>b)=>(c=>d))");
+		
+		Expression ex5 = null;
+		try {
+			ex5 = new Expression("((~a=>b)=>(c=>d))");
+		}
+		catch(IllegalLineException e) {
+			System.out.println(e.getMessage());
+		}
+		Expression.ExprTree.ExprTreeNode node5 = ex5.exprtree.myRoot;
+		assertEquals(node5.toString(), "((~a=>b)=>(c=>d))");
+		
+		Expression ex6 = null;
+		try {
+			ex6 = new Expression("((~a=>b)=>(c=>~(d=>~(e=>(f=>~g)))))");
+		}
+		catch(IllegalLineException e) {
+			System.out.println(e.getMessage());
+		}
+		Expression.ExprTree.ExprTreeNode node6 = ex6.exprtree.myRoot;
+		assertEquals(node6.toString(), "((~a=>b)=>(c=>~(d=>~(e=>(f=>~g)))))");
 
 }
