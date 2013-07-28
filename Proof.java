@@ -3,23 +3,33 @@ import java.util.*;
 
 public class Proof {
 	
-	public static LineNumber lastLineNumber;
-	private ArrayList<String> proofSteps;
-	LinkedList<Object> myLinkedList;
+	public static ArrayList<String> lastLineNumber = new ArrayList<String>();
 	TheoremSet mytheorems;
 	LineNumber valueholder = new LineNumber("1");
-	
-	public static HashMap<LineNumber, LinkedList> myLineNumbers = new HashMap<LineNumber, LinkedList>();
+	public ArrayList<String> proofSteps = new ArrayList<String>();
+	public static Stack<Expression> expr;
+
+	public static HashMap<String, LinkedList<Object>> myLineNumbers;
 
 	public Proof (TheoremSet theorems) {
 		mytheorems = theorems;
-		proofSteps = new ArrayList<String>();
+		expr = new Stack<Expression>();
+		myLineNumbers = new HashMap<String, LinkedList<Object>>();
 	}
+	
+	
 
 	public LineNumber nextLineNumber ( ) {
-		lastLineNumber = valueholder;
-		LineNumber valueholder = LineNumber.nextlinenumber_helper((String)myLineNumbers.get(valueholder).getFirst(), (Expression)myLineNumbers.get(lastLineNumber).getLast());
-		return valueholder;
+		if(myLineNumbers.isEmpty()){
+			return valueholder;
+		}else{
+			lastLineNumber.add(valueholder.getNum());
+			String operation = (String)myLineNumbers.get(lastLineNumber.get(lastLineNumber.size()-1)).getFirst();
+			//System.out.println(operation);
+			Expression pastExpr = (Expression)myLineNumbers.get(lastLineNumber.get(lastLineNumber.size()-1)).getLast();
+			valueholder = valueholder.nextlinenumber_helper(operation, pastExpr, lastLineNumber.get(lastLineNumber.size()-1));
+			return valueholder;
+		}
 	}
 
 	public void extendProof (String x) throws IllegalLineException, IllegalInferenceException {
@@ -28,26 +38,39 @@ public class Proof {
 		try{
 			 templist = inputstringparser(x);
 		}catch (IllegalLineException e){
-			System.err.println(e.getMessage());
+			System.out.println(e.getMessage());
 		}catch (IllegalInferenceException a){
-			System.err.println(a.getMessage());
+			System.out.println(a.getMessage());
 		}
 		
 		try{
 			MethodCaller(templist);
 		}catch (IllegalLineException e){
-			System.err.println(e.getMessage());
+			System.out.println(e.getMessage());
 		}catch (IllegalInferenceException a){
-			System.err.println(a.getMessage());
+			System.out.println(a.getMessage());
 		}
-		proofStep.add(x);
-
-		myLineNumbers.put(lastLineNumber, myLinkedList);
+		proofSteps.add(valueholder.getNum() + "    " + x);
+		Proof.myLineNumbers.put(valueholder.getNum(), templist);
+		
+		
+		//if (myLineNumbers.containsKey("1")){
+			//System.out.println("There is a 1 key in the hashmap");
+			
+			//if (myLineNumbers.containsKey("2")){
+				
+				//System.out.println("There is a 2 key in the hashmap");
+				//if(myLineNumbers.containsKey("3")){
+					//System.out.println("There is a 3 key in the hashmap");
+				//}
+				//System.out.println(myLineNumbers.get("1").equals(myLineNumbers.get("2")));
+			//}
+		//}
 	}
 
 	public String toString ( ) {
 		String str = "";
-		Iterator<String> iter = proofStep.iterator();
+		Iterator<String> iter = proofSteps.iterator();
 		while (iter.hasNext()){
 			str += iter.next().toString();
 			str += "\n";
@@ -56,7 +79,7 @@ public class Proof {
 	}
 
 	public boolean isComplete ( ) {
-		if (LineNumber.firstShow == (Expression) myLineNumbers.get(lastLineNumber).getLast()) {
+		if (valueholder.firstShow == (Expression) myLineNumbers.get(lastLineNumber).getLast()) {
 			return true;
 		}
 		return false;
@@ -64,28 +87,35 @@ public class Proof {
 	
 	public LinkedList<Object> inputstringparser(String x) throws IllegalLineException, IllegalInferenceException{
 		
-		//Might not need this. Attempt to prevent person from inputting an empty line.
-		if(x == null){
-			throw new IllegalLineException("You must input something.");
-		}
+		LinkedList<Object> myLinkedList = new LinkedList<Object>();
 		
-		String[] myValues = x.split("\\s"); //Splits the input string based on white space.
+		//Might not need this. Attempt to prevent person from inputting an empty line.
+		
+		String[] myValues = x.split(" "); //Splits the input string based on white space.
 		
 		//Test if the user entered too many inputs for a single line.
 		if (myValues.length > 4){
 			throw new IllegalLineException("Too many arguments inputted. Max possible is 4.");
 		}
+		if (myValues.length < 1){
+			throw new IllegalLineException("Must input something.");
+		}
+		
 		
 		for (int i = 0; i < myValues.length; i++){ //Adds each element of the split up input string 
 			myLinkedList.add(myValues[i]);         //into a LinkedList in sequential order. 
 		}										   //ex. "assume (a=>b)" is put in as "assume", "(a=>b)"
 		
+		//System.out.println(myLinkedList.size());
+		
 		String test = (String)myLinkedList.getFirst(); //The string representation of the operator.
+		
+		//System.out.println(test);
 		
 		//Test checking if the first argument of the input line is anything other than an approved operator.
 		//If it is not approved, then it throws an illegal line operator. 
-		if (test != "show" || test != "assume" || test != "repeat" || test != "print"  
-				|| test != "mp" || test != "ic" || test != "mt" || test != "co" || !mytheorems.myThms.containsKey(test)){
+		if (!test.equals("show") && !test.equals("assume") && !test.equals("repeat") && !test.equals("print")  
+				&& !test.equals("mp") && !test.equals("ic")  && !test.equals("mt") && !test.equals("co") && !mytheorems.myThms.containsKey(test)){
 			throw new IllegalLineException("Invalid operator.");
 		}
 		
@@ -94,8 +124,8 @@ public class Proof {
 			throw new IllegalLineException("Wrong number of arguments supplied for " + test + "statement. 2 needed.");
 		}
 		
-		//Test if wrong number of arguments are entered for repeat, mc, mt, or co.
-		if ((test == "repeat" || test == "mc" || test == "mt" || test == "co") && myLinkedList.size() != 4){
+		//Test if wrong number of arguments are entered for repeat, mp, mt, or co.
+		if ((test == "repeat" || test == "mp" || test == "mt" || test == "co") && myLinkedList.size() != 4){
 			throw new IllegalLineException("Wrong number of arguments for " + test + "statement. 4 needed.");
 		}
 		
@@ -127,23 +157,23 @@ public class Proof {
 		int removal_index = myLinkedList.size()-1;
 		myLinkedList.remove(removal_index);
 		myLinkedList.addLast(newExpr);
+		//System.out.println(myLinkedList.size());
 		return myLinkedList; //returning the correctly syntaxed LinkedList to then have methods called upon it.
 		}
 		
-
 	public void MethodCaller(LinkedList fun) throws IllegalLineException, IllegalInferenceException{
 		Expression exp1;
 		Expression exp2;
 		Expression test;
-		LineNumber linetest1 = new LineNumber("");
-		LineNumber linetest2 = new LineNumber("");
+		String linetest1 = new String("");
+		String linetest2 = new String("");
 		
 		if(fun.size() == 3){
-			linetest1 = new LineNumber((String)fun.get(1));
+			linetest1 = (String)fun.get(1);
 		}
 		if(fun.size() == 4){
-			linetest1 = new LineNumber((String)fun.get(1));
-			linetest2 = new LineNumber((String)fun.get(2));
+			linetest1 = (String)fun.get(1);
+			linetest2 = (String)fun.get(2);
 		}
 		
 		String op = (String)fun.getFirst();
@@ -153,12 +183,7 @@ public class Proof {
 			if (fun.size() != 2){
 				throw new IllegalLineException("Wrong number of arguments.");
 			}
-			
-			try{
-				Logic.show((Expression)fun.get(1), lastLineNumber);
-			}catch (IllegalInferenceException a){
-				throw a;
-			}
+
 		
 		}else if(op == "assume"){
 			
@@ -167,7 +192,7 @@ public class Proof {
 			}
 			
 			try{
-				Logic.assume((Expression)fun.get(1), lastLineNumber);
+				Logic.assume((Expression)fun.getLast(), lastLineNumber.get(lastLineNumber.size()-1));
 			}catch (IllegalInferenceException a){
 				throw a;
 			}
@@ -274,28 +299,31 @@ public class Proof {
 		}
 	
 	}
+	//Method that checks if the referenced line number is valid.
 	
-	public void linechecker(LineNumber test) throws IllegalLineException, IllegalInferenceException{
+
+	public void linechecker(String test) throws IllegalLineException, IllegalInferenceException{
 		String[] testline_values;
 		String[] my_line_values;
-		testline_values = test.getNum().split(".");
+		testline_values = test.split(".");
 		my_line_values = valueholder.getNum().split(".");
 		
+		//
 		if(!myLineNumbers.containsKey(test)){
 			throw new IllegalLineException("Bad line reference");
 		}
 		if (testline_values.length > my_line_values.length){
-			throw new IllegalInferenceException("Bad line reference. " + test.getNum() + "references an inner proof.");
+			throw new IllegalInferenceException("Bad line reference. " + test + "references an inner proof.");
 	    }
 		if(testline_values.length <= my_line_values.length){
 			for (int i = 0; i < testline_values.length ; i++){
 				if((i+1) == testline_values.length){
 					if(Integer.parseInt(testline_values[i]) >= Integer.parseInt(my_line_values[i])){
-						throw new IllegalInferenceException("Bad line reference. " + test.getNum());
+						throw new IllegalInferenceException("Bad line reference. " + test);
 					}
 				}
 				if (Integer.parseInt(testline_values[i]) != Integer.parseInt(my_line_values[i])){
-					throw new IllegalInferenceException("Bad line reference. " + test.getNum());
+					throw new IllegalInferenceException("Bad line reference. " + test);
 				}
 			}
 		}
