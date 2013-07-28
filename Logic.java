@@ -77,13 +77,12 @@ public class Logic {
 		}
 		// 3 repeat 2 p
 		// line == 2, expr == p
-		if (!exp1.myname.equals(myLineNumbers.get(line).getLast()) { //check to make sure repeat is referring to correct expression.
+		if (!exp1.myname.equals( (Expression) myLineNumbers.get(line).getLast()) { //check to make sure repeat is referring to correct expression.
 			throw new IllegalInferenceException("Repeat expression " + exp1.myname + "does not match expression " + myLineNumbers.get(line).getLast());
 		}
 		else {
-			exp1 = myLineNumbers.get(line).getLast(); //copy expression at referenced line into current expression.
+			exp1 = (Expression) myLineNumbers.get(line).getLast(); //copy expression at referenced line into current expression.
 		}
-
 
 	}	
 	
