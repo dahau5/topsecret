@@ -5,7 +5,7 @@ import org.junit.Test;
 
 public class TheoremSetTest {
 
-  // thm: a
+	// thm: a
 	// app: b
 	// app is a valid application of thm, no exception
 	// should be thrown
@@ -411,7 +411,7 @@ public class TheoremSetTest {
 	@Test
 	public void invalidTest8() {
 		String thm =  "~~~(p=>(p=>(p=>q)))";
-		String app = "~~~((a=>b)=>((a=>b)=>((a=>b)=>(b=>c))))";
+		String app = "~~~~((a=>b)=>((a=>b)=>((a=>b)=>(b=>c))))";
 		TheoremSet thmSet = new TheoremSet();
 		boolean erred = false;
 		String errmsg = "";
@@ -428,10 +428,13 @@ public class TheoremSetTest {
 			thmSet.checkTheoremApplication("thm", new Expression(app));
 		}
 		catch(IllegalLineException e) {
-			System.out.println(e.getMessage());
+			errmsg = e.getMessage();
 			erred = true;
+			if (DEBUGGING) {
+				System.out.println(errmsg);
+			}
 		}
-		assertFalse(erred);
+		assertTrue(erred);
 	}
 
 }
