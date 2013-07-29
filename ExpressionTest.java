@@ -6,8 +6,9 @@ import org.junit.Test;
 public class ExpressionTest {
 
     @Test
-    public void testbasic() throws IllegalLineException {
-        // Tests explicit base cases; generates the expression tree and manually checks nodes
+    public void testbasic() {
+        
+        //Tests explicit base cases; generates the expression tree and manually checks nodes
         boolean errored = false;
         Expression e = null;
         try {
@@ -47,7 +48,7 @@ public class ExpressionTest {
     }
     
     @Test
-    public void testcomplex() throws IllegalLineException {
+    public void testcomplex() {
         //Test to purely evaluate syntax parsing 
         Expression e = null;
         boolean errored = false;
@@ -134,7 +135,34 @@ public class ExpressionTest {
         }
         assertFalse(errored);
         
+    }
+    
+    @Test
+    public void testwithtrees() {
+        //Generates expressions and checks their equality with expressions of similar strings
+        boolean errored = false;
+        Expression e = null;
+        Expression d = null;
+        try {
+            e = new Expression("((a=>b)=>(c=>d))");
+            d = new Expression("((a=>b)=>(c=>d))");
+        } catch (IllegalLineException a) {
+            errored = true;
+        }
+        assertTrue(e != null);
+        assertTrue(d != null);
+        assertFalse(errored);
+        assertTrue(e.exprtree.equals(d.exprtree));
         
+        try {
+            e = new Expression("((a&b)=>d)");
+            d = new Expression("((a&b)=>x)");
+        } catch (IllegalLineException a) {
+            errored = true;
+        }
+        assertFalse(errored);
+        
+        assertFalse(e.exprtree.equals(d.exprtree));
     }
 
 }
