@@ -7,6 +7,7 @@ public class ExpressionTest {
 
     @Test
     public void testbasic() throws IllegalLineException {
+        // Tests explicit base cases; generates the expression tree and manually checks nodes
         boolean errored = false;
         Expression e = null;
         try {
