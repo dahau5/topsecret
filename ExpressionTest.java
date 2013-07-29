@@ -46,111 +46,94 @@ public class ExpressionTest {
     }
     
     @Test
-    public void test() throws IllegalLineException {
-        Expression e = new Expression("a");
+    public void testcomplex() throws IllegalLineException {
+        //Test to purely evaluate syntax parsing 
+        Expression e = null;
+        boolean errored = false;
+        // Test "a"
+        try {
+            e = new Expression("a");
+        } catch (IllegalLineException a) {
+            errored = true;
+        }
+        assertFalse(errored);
 
-        e = new Expression("c");
+        try {
+            e = new Expression("c");
+        } catch (IllegalLineException a) {
+            errored = true;
+        }
         assertTrue(e.exprtree.myRoot.get() == "c");
-        //e.exprtree.print();
+        assertFalse(errored);
         
-        e = new Expression("(a=>b)");
-        //e.exprtree.print();
+        // Test "(a=>(b))" : Should set 'errored' to true
+        try {
+            e = new Expression("(a=>(b))");
+        } catch (IllegalLineException a) {
+            errored = true;
+        }
+        assertTrue(errored);
+        errored = false;
         
-        e = new Expression("~~~~x");
-        //e.exprtree.print();
+        // Test multiple negations
+        try {
+            e = new Expression("~~~~x");
+        } catch (IllegalLineException a) {
+            errored = true;
+        }
+        assertFalse(errored);
+
+        // Test an unnecessary set of (): Should error
+        try {
+            e = new Expression("(~x(=>)~~a)");
+        } catch (IllegalLineException a) {
+            errored = true;
+        }
+        assertTrue(errored);
+        errored = false;
+
+        // Test multiple negations into a nested expression
+        try {
+            e = new Expression("~~~(a=>(b=>c))");
+        } catch (IllegalLineException a) {
+            errored = true;
+        }
+        assertFalse(errored);
+
+        // Test heavily nested expression
+        try {
+            e = new Expression("((a&b)=>~(b=>(c=>d)))");
+        } catch (IllegalLineException a) {
+            errored = true;
+        }
+        assertFalse(errored);
+
+        // Test heavily nested expression with slight error: Should error
+        try {
+            Expression b = new Expression("((a&b)a=>~(b=>(c=>d)))");
+        } catch (IllegalLineException a) {
+            errored = true;
+        }
+        assertTrue(errored);
+        errored = false;
         
-        e = new Expression("(~x=>~~a)");
-        //e.exprtree.print();
+        // Test heavily heavily nested expression
+        try {
+            Expression l = new Expression("((a=>(b=>c))=>((a=>b)=>(a=>c)))");
+        } catch (IllegalLineException a) {
+            errored = true;
+        }
+        assertFalse(errored);
         
-        e = new Expression("~~~(a=>b)");
-        //e.exprtree.print(); */
-        
-        e = new Expression("((a&b)=>~(b=>(c=>d)))");
-        //e.exprtree.print();
-        Expression b = new Expression("((a&b)=>~(b=>(c=>d)))");
-        
-        Expression l = new Expression("((a=>(b=>c))=>((a=>b)=>(a=>c)))");
-        //e.exprtree.print();
-        
-        assertTrue(e.exprtree.equals(b.exprtree));
-        
-        Expression a = new Expression("((a=>q)=>((b=>q)=>((a|b)=>q)))");
-        //a.exprtree.print();
+        // Test incredibly nested expression
+        try {
+            Expression a = new Expression("((a=>q)=>((b=>q)=>((a|b)=>q)))");
+        } catch (IllegalLineException a) {
+            errored = true;
+        }
+        assertFalse(errored);
         
         
     }
-    
-        @Test
-	public void nodeToStringTest() {
-		Expression ex = null;
-		try {
-			ex = new Expression("~a");
-		}
-		catch(IllegalLineException e) {
-			System.out.println(e.getMessage());
-		}
-		Expression.ExprTree.ExprTreeNode node = ex.exprtree.myRoot;
-		assertEquals(node.toString(), "~a");
-		
-		Expression ex1 = null;
-		try {
-			ex1 = new Expression("a");
-		}
-		catch(IllegalLineException e) {
-			System.out.println(e.getMessage());
-		}
-		Expression.ExprTree.ExprTreeNode node1 = ex1.exprtree.myRoot;
-		assertEquals(node1.toString(), "a");
-		
-		Expression ex2 = null;
-		try {
-			ex2 = new Expression("(a=>b)");
-		}
-		catch(IllegalLineException e) {
-			System.out.println(e.getMessage());
-		}
-		Expression.ExprTree.ExprTreeNode node2 = ex2.exprtree.myRoot;
-		assertEquals(node2.toString(), "(a=>b)");
-		
-		Expression ex3 = null;
-		try {
-			ex3 = new Expression("((a=>b)=>c)");
-		}
-		catch(IllegalLineException e) {
-			System.out.println(e.getMessage());
-		}
-		Expression.ExprTree.ExprTreeNode node3 = ex3.exprtree.myRoot;
-		assertEquals(node3.toString(), "((a=>b)=>c)");
-		
-		Expression ex4 = null;
-		try {
-			ex4 = new Expression("((a=>b)=>(c=>d))");
-		}
-		catch(IllegalLineException e) {
-			System.out.println(e.getMessage());
-		}
-		Expression.ExprTree.ExprTreeNode node4 = ex4.exprtree.myRoot;
-		assertEquals(node4.toString(), "((a=>b)=>(c=>d))");
-		
-		Expression ex5 = null;
-		try {
-			ex5 = new Expression("((~a=>b)=>(c=>d))");
-		}
-		catch(IllegalLineException e) {
-			System.out.println(e.getMessage());
-		}
-		Expression.ExprTree.ExprTreeNode node5 = ex5.exprtree.myRoot;
-		assertEquals(node5.toString(), "((~a=>b)=>(c=>d))");
-		
-		Expression ex6 = null;
-		try {
-			ex6 = new Expression("((~a=>b)=>(c=>~(d=>~(e=>(f=>~g)))))");
-		}
-		catch(IllegalLineException e) {
-			System.out.println(e.getMessage());
-		}
-		Expression.ExprTree.ExprTreeNode node6 = ex6.exprtree.myRoot;
-		assertEquals(node6.toString(), "((~a=>b)=>(c=>~(d=>~(e=>(f=>~g)))))");
-	}
 
 }
