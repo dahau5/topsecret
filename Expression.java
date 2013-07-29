@@ -12,6 +12,9 @@ public class Expression {
 
     /** Expression constructor. Checks validity of syntax in construction of ExprTree. */
     public Expression (String name) throws IllegalLineException {
+        if (name == null) {
+        	throw new IllegalLineException("Given null string.");
+    	}
         myname = name;
         try {
         exprtree = new ExprTree(name);
@@ -140,10 +143,10 @@ public class Expression {
                 if (currentchar == '(') {
                     parencount ++;
 <<<<<<< HEAD
-                    i ++;
+                    
                 } else if (currentchar == ')') {
                     parencount --;
-                    i ++;
+                    
 =======
                    
                 } else if (currentchar == ')') {
