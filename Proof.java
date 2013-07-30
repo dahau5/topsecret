@@ -26,16 +26,29 @@ public class Proof {
 	
 	
 
-	public LineNumber nextLineNumber ( ) {
+	public String nextLineNumber ( ) {
 		if(myLineNumbers.isEmpty()){
-			return valueholder;
-		}else{
 			lastLineNumber.add(valueholder.getNum());
-			String operation = (String)myLineNumbers.get(lastLineNumber.get(lastLineNumber.size()-1)).getFirst();
-			//System.out.println(operation);
-			Expression pastExpr = (Expression)myLineNumbers.get(lastLineNumber.get(lastLineNumber.size()-1)).getLast();
+			return valueholder.getNum();
+		}else{
+			String operation = "";
+			Expression pastExpr = null;
+			lastLineNumber.add(valueholder.getNum());
+			
+			try{
+				operation = (String)myLineNumbers.get(lastLineNumber.get(lastLineNumber.size()-1)).getFirst();
+				pastExpr = (Expression)myLineNumbers.get(lastLineNumber.get(lastLineNumber.size()-1)).getLast();
+			
+			}catch (NullPointerException e){
+				lastLineNumber.remove(lastLineNumber.size()-1);
+				operation = (String)myLineNumbers.get(lastLineNumber.get(lastLineNumber.size()-1)).getFirst();
+				pastExpr = (Expression)myLineNumbers.get(lastLineNumber.get(lastLineNumber.size()-1)).getLast();
+			}
+			
+			
 			valueholder = valueholder.nextlinenumber_helper(operation, pastExpr, lastLineNumber.get(lastLineNumber.size()-1));
-			return valueholder;
+			
+			return valueholder.getNum();
 		}
 	}
 
@@ -50,6 +63,12 @@ public class Proof {
 			throw a;
 		}
 		
+		if(myLineNumbers.isEmpty()){
+			if(!templist.getFirst().equals("show")){
+				throw new IllegalLineException("First argument must be show.");
+			}
+		}
+		
 		try{
 			MethodCaller(templist);
 		}catch (IllegalLineException e){
@@ -57,7 +76,8 @@ public class Proof {
 		}catch (IllegalInferenceException a){
 			throw a;
 		}
-		System.out.println(valueholder.getNum());
+		//System.out.println(valueholder.getNum());
+		
 		proofSteps.add(valueholder.getNum() + "    " + x);
 		Proof.myLineNumbers.put(valueholder.getNum(), templist);
 		
@@ -302,6 +322,11 @@ public class Proof {
 				throw a;
 			}
 			
+		}else{
+			
+			exp1 = (Expression)fun.getLast();
+			
+			mytheorems.checkTheoremApplication(op, exp1);
 		}
 	
 	
@@ -314,10 +339,6 @@ public class Proof {
 		String[] my_line_values;
 		testline_values = test.split(".");
 		my_line_values = valueholder.getNum().split(".");
-		
-		//
-		
-		System.out.println("I made it into the linechecker.");
 		
 		if(!myLineNumbers.containsKey(test)){
 			throw new IllegalInferenceException("Bad line reference");
