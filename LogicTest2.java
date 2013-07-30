@@ -5,7 +5,7 @@ import org.junit.Test;
 
 public class LogicTest2 {
 
-  @Test
+	@Test
 	public void testAssume() {
 		boolean errored, errored2;
 		Expression exp1, exp2, exp3, exp4, exp5, exp6;
