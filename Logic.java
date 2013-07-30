@@ -23,7 +23,12 @@ public class Logic {
 				throw new IllegalInferenceException("Can only infer the '~' of an '&' or '|'.");
 			}
 		}
-		if(exp1.myname.equals(not) || Expression.ExprTree.treeEqualshelper(exp1.exprtree.myRoot, exp2.exprtree.myRoot.getleft())){
+		if(exp2.myname.length() == 1){
+			if(exp1.myname.charAt(0) != ('~')){
+				throw new IllegalInferenceException("An assume of a single varialbe expression must be the ~ of it.");
+			}
+			
+		}else if(exp1.myname.equals(not) || Expression.ExprTree.treeEqualshelper(exp1.exprtree.myRoot, exp2.exprtree.myRoot.getleft())){
 			//Keep on chuggin. Correct syntax, no exception required.
 		}else{
 			throw new IllegalInferenceException("Bad assumption. Assume must either be the left of the previous expr or '~' of the entire expr.");
