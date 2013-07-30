@@ -13,7 +13,7 @@ public class Expression {
     /** Expression constructor. Checks validity of syntax in construction of ExprTree. */
     public Expression (String name) throws IllegalLineException {
         if (name == null) {
-        	throw new IllegalLineException("Given null string.");
+    		throw new IllegalLineException("Given null string.");
     	}
         myname = name;
         try {
@@ -25,11 +25,7 @@ public class Expression {
     
     public boolean equals(Object obj) {
         Expression second;
-        try {
-            second = (Expression) obj;
-        } catch (IllegalArgumentException e) {
-            throw e;
-        }
+        second = (Expression) obj;
         return (myname.equals(second.myname)
                 && exprtree.equals(second.exprtree));
     }
@@ -100,7 +96,7 @@ public class Expression {
             // However, that element MUST be a letter - throw exception otherwise
             if (s.length() == 1) {
                 if (!alphabet.contains(s)) {
-                    throw new IllegalArgumentException("Branched to single element, wasn't variable.");
+                    throw new IllegalLineException("Branched to single element, wasn't variable.");
                 }
                 node.myItem = s;
                 return node;
@@ -119,7 +115,7 @@ public class Expression {
             
             // String wasn't one-element, therefore it should start with only ~ or (
             if (!first.equals("(")) {
-                throw new IllegalArgumentException("Branched to subexpression of length > 1,"
+                throw new IllegalLineException("Branched to subexpression of length > 1,"
                         + "didn't start with ( or ~ (expression must either be wrapped() or ~)");
             }
             
@@ -138,21 +134,14 @@ public class Expression {
             while(i < s.length()) {
                 char currentchar = s.charAt(i);
                 if (parencount < 0) {
-                    throw new IllegalArgumentException("More ) than (");
+                    throw new IllegalLineException("More ) than (");
                 }
                 if (currentchar == '(') {
                     parencount ++;
-<<<<<<< HEAD
-                    
+                
                 } else if (currentchar == ')') {
                     parencount --;
-                    
-=======
-                   
-                } else if (currentchar == ')') {
-                    parencount --;
-                   
->>>>>>> Added toString() to ExprTreeNode
+                  
                 // Assumes you've reached the '>' in "=>"
                 } else if (currentchar == '>' && s.charAt(i-1) == '=' && parencount == 0) {
                     node.myItem = "=>";
@@ -248,14 +237,8 @@ public class Expression {
             public ExprTreeNode getright() {
                 return myright;
             }
-<<<<<<< HEAD
-        }
-    }
-}
-=======
             
-            
-            // Reassembles a String of a full expression from its
+         // Reassembles a String of a full expression from its
             // root down
             public String toString() {
             	if (myItem == null) {
@@ -280,4 +263,3 @@ public class Expression {
         }
     }
 }
->>>>>>> Added toString() to ExprTreeNode
